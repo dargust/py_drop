@@ -1,4 +1,5 @@
 import pygame as py
+import random
 py.init()
 
 WINDOW_WIDTH = 180
@@ -78,7 +79,7 @@ class Game():
                 self.surface.set_alpha(self.alpha)
                 if self.end_counter > 0: self.end_counter -= 1
                 else: return 1
-  return 0
+        return 0
 def main():
     game = Game()
     done = False
@@ -92,14 +93,14 @@ def main():
             elif event.type == py.KEYUP:
                 if event.key == py.K_LEFT: game.holding_left = False
                 elif event.key == py.K_RIGHT: game.holding_right = False
-    if game.update():
-        print game.score
-        done = True
-    screen.fill((255,255,255))
-    display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
-    screen.blit(display_surf,(0,0))
-    py.display.flip()
-    clock.tick(FPS)
+        if game.update():
+            print game.score
+            done = True
+        screen.fill((255,255,255))
+        display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
+        screen.blit(display_surf,(0,0))
+        py.display.flip()
+        clock.tick(FPS)
 
 if __name__ == '__main__':
     main()
