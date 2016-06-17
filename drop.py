@@ -1,9 +1,15 @@
 import pygame as py
 import random
+import sys
 py.init()
 
-WINDOW_WIDTH = 180
-WINDOW_HEIGHT = 320
+if len(sys.argv) > 1:
+    a,b = sys.argv[1].split('x')
+    WINDOW_WIDTH = int(a)
+    WINDOW_HEIGHT = int(b)
+else:
+    WINDOW_WIDTH = 180
+    WINDOW_HEIGHT = 320
 _width = 180
 _height = 320
 FPS = 30
