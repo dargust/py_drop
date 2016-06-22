@@ -23,6 +23,7 @@ FPS = 30
 
 screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
 clock = py.time.Clock()
+font = py.font.Font(None,256)
 
 class Game():
     class Player():
@@ -118,6 +119,8 @@ class Game():
                 self.surface.set_alpha(self.alpha)
                 if self.end_counter > 0: self.end_counter -= 1
                 else: return 1
+            text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT))
+            screen.blit(text,(0,0))
         return 0
 
 def main():
@@ -139,10 +142,10 @@ def main():
             elif event.type == py.KEYUP:
                 if event.key == py.K_LEFT: game.holding_left = False
                 elif event.key == py.K_RIGHT: game.holding_right = False
+        screen.fill((255,255,255))
         if game.update():
             print("Final score: "+str(game.score))
             done = True
-        screen.fill((255,255,255))
         display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
         screen.blit(display_surf,(0,0))
         py.display.flip()
