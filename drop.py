@@ -10,24 +10,24 @@ if len(sys.argv) > 1:
 else:
     WINDOW_WIDTH = 180
     WINDOW_HEIGHT = 320
-_width = 180
-_height = 320
+_width = 45
+_height = 80
 FPS = 30
 
-screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
+screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
 clock = py.time.Clock()
 
 class Game():
     class Player():
         def __init__(self):
-            self.size = 20
+            self.size = 5
             self.rect = py.Rect(_width/2-self.size/2,_height-self.size,self.size,self.size)
             self.delta = 0
         def update(self):
             if 0 < self.rect.left+self.delta < _width-self.size: self.rect.left += self.delta
     class Block():
         def __init__(self,delta_delta):
-            size = random.randint(14,36)
+            size = random.randint(4,9)
             self.delta = 0
             self.delta_delta = delta_delta
             self.rect = py.Rect(random.randint(0,_width-size),-size,size,size)
@@ -42,7 +42,7 @@ class Game():
         self.surface.set_alpha(self.alpha)
         self.number_of_blocks = 30
         self.block_delay = 30
-        self.block_delta = 0.5
+        self.block_delta = 0.125
         self.level,self.level_timer = 0,0
         self.level_timer_max = 5000
         self.score = 0
@@ -52,8 +52,8 @@ class Game():
         self.end_counter = 60
         self.done = False
     def update(self):
-        if self.holding_left: self.player.delta = -3
-        elif self.holding_right: self.player.delta = 3
+        if self.holding_left: self.player.delta = -1
+        elif self.holding_right: self.player.delta = 1
         else: self.player.delta = 0
         if self.tick_counter >= self.block_delay:
             self.tick_counter = 0
@@ -66,7 +66,7 @@ class Game():
         if self.level_timer >= self.level_timer_max and self.level < 30:
             self.level += 1
             if self.block_delay > 3: self.block_delay -= 1
-            self.block_delta -= 0.01
+            self.block_delta -= 0.0025
             self.level_timer = 0
             self.level_timer_max = int(self.level_timer_max * 1.1)
         self.player.update()
@@ -86,12 +86,19 @@ class Game():
                 if self.end_counter > 0: self.end_counter -= 1
                 else: return 1
         return 0
+
 def main():
+    global screen
+    global WINDOW_WIDTH
+    global WINDOW_HEIGHT
     game = Game()
     done = False
     while not done:
         for event in py.event.get():
             if event.type == py.QUIT: done = True
+            elif event.type == py.VIDEORESIZE:
+                WINDOW_WIDTH,WINDOW_HEIGHT = event.dict['size']
+                screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
             elif event.type == py.KEYDOWN:
                 if event.key == py.K_ESCAPE: done = True
                 elif event.key == py.K_LEFT: game.holding_left = True
