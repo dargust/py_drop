@@ -8,7 +8,7 @@ if len(sys.argv) > 1:
     try:
         a,b = sys.argv[1].split('x')
     except:
-        print("Incorrect syntax\nusage: python drop.py 50x50")
+        print("Incorrect syntax\nusage: python drop.py 180x320")
         a,b = 180,320
         py.quit()
         sys.exit()
