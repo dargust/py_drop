@@ -37,12 +37,17 @@ class Game():
     class Block():
         block_image = py.image.load("Block.png")
         block_image_special = py.image.load("Block_special.png")
-        def __init__(self,delta_delta,special=False):
+        block_image_point = py.image.load("Block_point.png")
+        def __init__(self,delta_delta,btype=0):
             size = random.randint(4,9)
-            if not special:
+            if btype == 0:
                 self.image = py.transform.scale(self.block_image,(size,size))
-            else:
+            elif btype == 1:
                 self.image = py.transform.scale(self.block_image_special,(size+2,size+2))
+            elif btype == 2:
+                size = 4
+                self.image = py.transform.scale(self.block_image_point,(size,size))
+            self.type = btype
             self.delta = 0
             self.delta_delta = delta_delta
             self.rect = py.Rect(random.randint(0,_width-size),-size,size,size)
@@ -67,6 +72,8 @@ class Game():
         self.tick_counter = 0
         self.end_counter = 60
         self.done = False
+        self.block_point_counter = 0
+        self.block_point_counter_max = 150
     def update(self):
         if self.holding_left: self.player.delta = -1
         elif self.holding_right: self.player.delta = 1
@@ -85,10 +92,19 @@ class Game():
             self.block_delta -= 0.0025
             self.level_timer = 0
             self.level_timer_max = int(self.level_timer_max * 1.1)
-            self.block_list.append(self.Block(0.01,True))
+            self.block_list.append(self.Block(0.01,1))
+        self.block_point_counter += 1
+        if self.block_point_counter >= self.block_point_counter_max:
+            self.block_point_counter = 0
+            self.block_list.append(self.Block(0.01,2))
         self.player.update()
         for block in self.block_list:
-            if block.rect.colliderect(self.player.rect): self.done = True
+            if block.rect.colliderect(self.player.rect):
+                if not block.type == 2:
+                    self.done = True
+                else:
+                    self.score += 10
+                    self.block_list.remove(block)
             block.update()
         self.surface.blit(self.background_image,(0,0))
         self.surface.blit(self.player.image,self.player.rect)
