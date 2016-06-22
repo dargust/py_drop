@@ -93,16 +93,12 @@ class Game():
         self.block_point_counter = 0
         self.block_point_counter_max = 150
         self.high_score = 0
-        if not os.path.isfile("gameinfo.dat"):
-            pass
-        else:
+        if os.path.isfile("gameinfo.dat"):
             with open("gameinfo.dat","rb") as f:
                 f.seek(16)
                 numbers_string = ""
-                for c in f.read():
-                    numbers_string += str(ord(c))
-                if numbers_string:
-                    self.high_score = int(numbers_string)
+                for c in f.read(): numbers_string += str(ord(c))
+                if numbers_string: self.high_score = int(numbers_string)
             with open("gameinfo.dat","rb") as f:
                 if not f.read(16) == binascii.unhexlify(md5(os.path.abspath(__file__),includeLine=str(self.high_score))):
                     py.quit()
