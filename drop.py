@@ -1,3 +1,4 @@
+from __future__ import print_function
 import pygame as py
 import random
 import sys
@@ -7,8 +8,10 @@ if len(sys.argv) > 1:
     try:
         a,b = sys.argv[1].split('x')
     except:
-        print "Incorrect syntax, usage: python drop.py 50x50"
+        print("Incorrect syntax\nusage: python drop.py 50x50")
         a,b = 180,320
+        py.quit()
+        sys.exit()
     WINDOW_WIDTH = int(a)
     WINDOW_HEIGHT = int(b)
 else:
@@ -24,14 +27,22 @@ clock = py.time.Clock()
 class Game():
     class Player():
         def __init__(self):
+            self.image = py.image.load("Player.png")
             self.size = 5
-            self.rect = py.Rect(_width/2-self.size/2,_height-self.size,self.size,self.size)
+            self.rect = self.image.get_rect()
+            self.rect.x,self.rect.y = _width/2-self.size/2,_height-self.size
             self.delta = 0
         def update(self):
             if 0 < self.rect.left+self.delta < _width-self.size: self.rect.left += self.delta
     class Block():
-        def __init__(self,delta_delta):
+        block_image = py.image.load("Block.png")
+        block_image_special = py.image.load("Block_special.png")
+        def __init__(self,delta_delta,special=False):
             size = random.randint(4,9)
+            if not special:
+                self.image = py.transform.scale(self.block_image,(size,size))
+            else:
+                self.image = py.transform.scale(self.block_image_special,(size+2,size+2))
             self.delta = 0
             self.delta_delta = delta_delta
             self.rect = py.Rect(random.randint(0,_width-size),-size,size,size)
@@ -42,6 +53,7 @@ class Game():
         self.timer = py.time.Clock()
         self.player = self.Player()
         self.surface = py.Surface((_width,_height))
+        self.background_image = py.image.load("Background.png")
         self.alpha = 255
         self.surface.set_alpha(self.alpha)
         self.number_of_blocks = 30
@@ -73,13 +85,14 @@ class Game():
             self.block_delta -= 0.0025
             self.level_timer = 0
             self.level_timer_max = int(self.level_timer_max * 1.1)
+            self.block_list.append(self.Block(0.01,True))
         self.player.update()
         for block in self.block_list:
             if block.rect.colliderect(self.player.rect): self.done = True
             block.update()
-        self.surface.fill((255,255,255))
-        py.draw.rect(self.surface,(0,0,255),self.player.rect)
-        for block in self.block_list: py.draw.rect(self.surface,(0,0,0),block.rect)
+        self.surface.blit(self.background_image,(0,0))
+        self.surface.blit(self.player.image,self.player.rect)
+        for block in self.block_list: self.surface.blit(block.image,block.rect)#py.draw.rect(self.surface,(0,0,0),block.rect)
         if self.done:
             if self.alpha > 0:
                 self.alpha -= 5
@@ -111,7 +124,7 @@ def main():
                 if event.key == py.K_LEFT: game.holding_left = False
                 elif event.key == py.K_RIGHT: game.holding_right = False
         if game.update():
-            print game.score
+            print("Final score: "+str(game.score))
             done = True
         screen.fill((255,255,255))
         display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
