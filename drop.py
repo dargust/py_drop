@@ -138,7 +138,7 @@ class Game():
             block.update()
         self.surface.blit(self.background_image,(0,0))
         self.surface.blit(self.player.image,self.player.rect)
-        for block in self.block_list: self.surface.blit(block.image,block.rect)#py.draw.rect(self.surface,(0,0,0),block.rect)
+        for block in self.block_list: self.surface.blit(block.image,block.rect)
         if self.done:
             if self.alpha > 0:
                 self.alpha -= 5
