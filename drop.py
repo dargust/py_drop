@@ -155,38 +155,65 @@ def main():
     global screen
     global WINDOW_WIDTH
     global WINDOW_HEIGHT
-    game = Game()
-    done = False
-    while not done:
-        for event in py.event.get():
-            if event.type == py.QUIT: done = True
-            elif event.type == py.VIDEORESIZE:
-                WINDOW_WIDTH,WINDOW_HEIGHT = event.dict['size']
-                screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
-            elif event.type == py.KEYDOWN:
-                if event.key == py.K_ESCAPE: done = True
-                elif event.key == py.K_LEFT: game.holding_left = True
-                elif event.key == py.K_RIGHT: game.holding_right = True
-            elif event.type == py.KEYUP:
-                if event.key == py.K_LEFT: game.holding_left = False
-                elif event.key == py.K_RIGHT: game.holding_right = False
-        screen.fill((255,255,255))
-        if game.update():
-            print("Final score: "+str(game.score))
-            if game.score > game.high_score:
-                with open("gameinfo.dat","wb") as f:
-                    f.write(binascii.unhexlify(md5(os.path.abspath(__file__),includeLine=str(game.score))))
-                    for c in str(game.score):
-                        f.write(chr(int(c)))
-            done = True
-        display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
-        text = py.transform.scale(font.render(str(game.score),1,(1,1,1)),(WINDOW_WIDTH/5,WINDOW_HEIGHT/10))
-        text2 = py.transform.scale(font.render(str(game.high_score),1,(1,1,1)),(WINDOW_WIDTH/5,WINDOW_HEIGHT/10))
-        display_surf.blit(text,(0,0))
-        display_surf.blit(text2,(0,WINDOW_HEIGHT/10))
-        screen.blit(display_surf,(0,0))
-        py.display.flip()
-        clock.tick(FPS)
+    finished = False
+    while not finished:
+        game = Game()
+        done = True
+        menu = True
+        text1 = font.render("Play:  ENTER",1,(0,0,0))
+        text2 = font.render("Quit: ESCAPE",1,(0,0,0))
+        while menu:
+            for event in py.event.get():
+                if event.type == py.QUIT:
+                    menu = False
+                    finished = True
+                elif event.type == py.VIDEORESIZE:
+                    WINDOW_WIDTH,WINDOW_HEIGHT = event.dict['size']
+                    screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
+                elif event.type == py.KEYDOWN:
+                    if event.key == py.K_ESCAPE:
+                        menu = False
+                        finished = True
+                    elif event.key == py.K_RETURN:
+                        menu = False
+                        done = False
+            text1 = py.transform.scale(text1,(WINDOW_WIDTH,WINDOW_HEIGHT/8))
+            text2 = py.transform.scale(text2,(WINDOW_WIDTH,WINDOW_HEIGHT/8))
+            screen.fill((255,255,255))
+            screen.blit(text1,(0,0))
+            screen.blit(text2,(0,WINDOW_HEIGHT-WINDOW_HEIGHT/8))
+            py.display.flip()
+            clock.tick(30)
+        while not done:
+            for event in py.event.get():
+                if event.type == py.QUIT: done = True
+                elif event.type == py.VIDEORESIZE:
+                    WINDOW_WIDTH,WINDOW_HEIGHT = event.dict['size']
+                    screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
+                elif event.type == py.KEYDOWN:
+                    if event.key == py.K_ESCAPE: done = True
+                    elif event.key == py.K_LEFT: game.holding_left = True
+                    elif event.key == py.K_RIGHT: game.holding_right = True
+                elif event.type == py.KEYUP:
+                    if event.key == py.K_LEFT: game.holding_left = False
+                    elif event.key == py.K_RIGHT: game.holding_right = False
+            screen.fill((255,255,255))
+            if game.update():
+                print("Final score: "+str(game.score))
+                if game.score > game.high_score:
+                    with open("gameinfo.dat","wb") as f:
+                        f.write(binascii.unhexlify(md5(os.path.abspath(__file__),includeLine=str(game.score))))
+                        for c in str(game.score):
+                            f.write(chr(int(c)))
+                done = True
+            display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
+            text = py.transform.scale(font.render(str(game.score),1,(1,1,1)),(WINDOW_WIDTH/5,WINDOW_HEIGHT/10))
+            text2 = py.transform.scale(font.render(str(game.high_score),1,(1,1,1)),(WINDOW_WIDTH/5,WINDOW_HEIGHT/10))
+            display_surf.blit(text,(0,0))
+            display_surf.blit(text2,(0,WINDOW_HEIGHT/10))
+            screen.blit(display_surf,(0,0))
+            py.display.flip()
+            clock.tick(FPS)
 
 if __name__ == '__main__':
     main()
