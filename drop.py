@@ -2,6 +2,8 @@ from __future__ import print_function
 import pygame as py
 import random
 import sys
+import os.path
+import hashlib,binascii
 py.init()
 
 if len(sys.argv) > 1:
@@ -26,6 +28,20 @@ clock = py.time.Clock()
 font = py.font.Font(None,256)
 font2 = py.font.Font(None,36)
 
+def md5(fileName, excludeLine="", includeLine=""):
+    m = hashlib.md5()
+    try:
+        fd = open(fileName,"rb")
+    except IOError:
+        return
+    content = fd.readlines()
+    fd.close()
+    for eachLine in content:
+        if excludeLine and eachLine.startswith(excludeLine):
+            continue
+        m.update(eachLine)
+    m.update(includeLine)
+    return m.hexdigest()
 class Game():
     class Player():
         def __init__(self):
@@ -76,6 +92,22 @@ class Game():
         self.done = False
         self.block_point_counter = 0
         self.block_point_counter_max = 150
+        self.high_score = 0
+        if not os.path.isfile("gameinfo.dat"):
+            pass
+        else:
+            with open("gameinfo.dat","rb") as f:
+                f.seek(16)
+                numbers_string = ""
+                for c in f.read():
+                    numbers_string += str(ord(c))
+                if numbers_string:
+                    self.high_score = int(numbers_string)
+            with open("gameinfo.dat","rb") as f:
+                if not f.read(16) == binascii.unhexlify(md5(os.path.abspath(__file__),includeLine=str(self.high_score))):
+                    py.quit()
+                    sys.exit()
+    
     def update(self):
         if self.holding_left: self.player.delta = -1
         elif self.holding_right: self.player.delta = 1
@@ -122,7 +154,6 @@ class Game():
                 else: return 1
             text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT))
             screen.blit(text,(0,0))
-            
         return 0
 
 def main():
@@ -147,10 +178,17 @@ def main():
         screen.fill((255,255,255))
         if game.update():
             print("Final score: "+str(game.score))
+            if game.score > game.high_score:
+                with open("gameinfo.dat","wb") as f:
+                    f.write(binascii.unhexlify(md5(os.path.abspath(__file__),includeLine=str(game.score))))
+                    for c in str(game.score):
+                        f.write(chr(int(c)))
             done = True
         display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
         text = py.transform.scale(font2.render(str(game.score),1,(1,1,1)),(WINDOW_WIDTH/10,WINDOW_HEIGHT/10))
+        text2 = py.transform.scale(font2.render(str(game.high_score),1,(1,1,1)),(WINDOW_WIDTH/10,WINDOW_HEIGHT/10))
         display_surf.blit(text,(0,0))
+        display_surf.blit(text2,(0,WINDOW_HEIGHT/10))
         screen.blit(display_surf,(0,0))
         py.display.flip()
         clock.tick(FPS)
