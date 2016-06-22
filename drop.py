@@ -4,7 +4,11 @@ import sys
 py.init()
 
 if len(sys.argv) > 1:
-    a,b = sys.argv[1].split('x')
+    try:
+        a,b = sys.argv[1].split('x')
+    except:
+        print "Incorrect syntax, usage: python drop.py 50x50"
+        a,b = 180,320
     WINDOW_WIDTH = int(a)
     WINDOW_HEIGHT = int(b)
 else:
