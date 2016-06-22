@@ -26,7 +26,6 @@ FPS = 30
 screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
 clock = py.time.Clock()
 font = py.font.Font(None,256)
-font2 = py.font.Font(None,36)
 
 def md5(fileName, excludeLine="", includeLine=""):
     m = hashlib.md5()
@@ -181,8 +180,8 @@ def main():
                         f.write(chr(int(c)))
             done = True
         display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
-        text = py.transform.scale(font2.render(str(game.score),1,(1,1,1)),(WINDOW_WIDTH/10,WINDOW_HEIGHT/10))
-        text2 = py.transform.scale(font2.render(str(game.high_score),1,(1,1,1)),(WINDOW_WIDTH/10,WINDOW_HEIGHT/10))
+        text = py.transform.scale(font.render(str(game.score),1,(1,1,1)),(WINDOW_WIDTH/5,WINDOW_HEIGHT/10))
+        text2 = py.transform.scale(font.render(str(game.high_score),1,(1,1,1)),(WINDOW_WIDTH/5,WINDOW_HEIGHT/10))
         display_surf.blit(text,(0,0))
         display_surf.blit(text2,(0,WINDOW_HEIGHT/10))
         screen.blit(display_surf,(0,0))
