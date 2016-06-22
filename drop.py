@@ -24,6 +24,7 @@ FPS = 30
 screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
 clock = py.time.Clock()
 font = py.font.Font(None,256)
+font2 = py.font.Font(None,36)
 
 class Game():
     class Player():
@@ -121,6 +122,7 @@ class Game():
                 else: return 1
             text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT))
             screen.blit(text,(0,0))
+            
         return 0
 
 def main():
@@ -147,6 +149,8 @@ def main():
             print("Final score: "+str(game.score))
             done = True
         display_surf = py.transform.scale(game.surface,(WINDOW_WIDTH,WINDOW_HEIGHT))
+        text = py.transform.scale(font2.render(str(game.score),1,(1,1,1)),(WINDOW_WIDTH/10,WINDOW_HEIGHT/10))
+        display_surf.blit(text,(0,0))
         screen.blit(display_surf,(0,0))
         py.display.flip()
         clock.tick(FPS)
