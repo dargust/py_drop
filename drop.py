@@ -9,6 +9,9 @@ py.init()
 if len(sys.argv) > 1:
     try:
         a,b = sys.argv[1].split('x')
+        if int(a) < 45 or int(b) < 80:
+            a,b = 45,80
+            print("window must be 45x80 or larger")
     except:
         print("Incorrect syntax\nusage: python drop.py 180x320")
         a,b = 180,320
@@ -23,7 +26,10 @@ _width = 45
 _height = 80
 FPS = 30
 
+print("creating window: "+str(WINDOW_WIDTH)+"x"+str(WINDOW_HEIGHT))
 screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
+py.display.set_icon(py.image.load("icon.ico"))
+py.display.set_caption("Bobl")
 clock = py.time.Clock()
 font = py.font.Font(None,256)
 
@@ -97,13 +103,17 @@ class Game():
         self.block_point_counter_max = 150
         self.high_score = 0
         if os.path.isfile("gameinfo.dat"):
+            print("checking highscores...")
             with open("gameinfo.dat","rb") as f:
                 f.seek(16)
                 numbers_string = ""
                 for c in f.read(): numbers_string += str(ord(c))
                 if numbers_string: self.high_score = int(numbers_string)
+                print("highscore: "+str(self.high_score))
             with open("gameinfo.dat","rb") as f:
                 if not f.read(16) == binascii.unhexlify(md5(os.path.abspath(__file__),includeLine=str(self.high_score))):
+                    print("highscores file corrupt...")
+                    print("exiting...")
                     py.quit()
                     sys.exit()
     
@@ -151,8 +161,10 @@ class Game():
                 self.surface.set_alpha(self.alpha)
                 if self.end_counter > 0: self.end_counter -= 1
                 else: return 1
-            text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT))
-            screen.blit(text,(0,0))
+            text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT/4))
+            background = py.transform.scale(self.background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
+            screen.blit(background,(0,0))
+            screen.blit(text,(0,WINDOW_HEIGHT/6))
         return 0
 
 def main():
@@ -162,10 +174,14 @@ def main():
     finished = False
     while not finished:
         game = Game()
+        print("game initialised...")
         done = True
         menu = True
         text1 = font.render("Play:  ENTER",1,(0,0,0))
         text2 = font.render("Quit: ESCAPE",1,(0,0,0))
+        text3 = font.render("Highscore:"+str(game.high_score),1,(0,0,0))
+        menu_background = py.transform.scale(game.background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
+        print("entering menu...")
         while menu:
             for event in py.event.get():
                 if event.type == py.QUIT:
@@ -174,6 +190,7 @@ def main():
                 elif event.type == py.VIDEORESIZE:
                     WINDOW_WIDTH,WINDOW_HEIGHT = event.dict['size']
                     screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
+                    menu_background = py.transform.scale(game.background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
                 elif event.type == py.KEYDOWN:
                     if event.key == py.K_ESCAPE:
                         menu = False
@@ -183,11 +200,14 @@ def main():
                         done = False
             text1 = py.transform.scale(text1,(WINDOW_WIDTH,WINDOW_HEIGHT/8))
             text2 = py.transform.scale(text2,(WINDOW_WIDTH,WINDOW_HEIGHT/8))
-            screen.fill((255,255,255))
+            text3 = py.transform.scale(text3,(WINDOW_WIDTH,WINDOW_HEIGHT/8))
+            screen.blit(menu_background,(0,0))
             screen.blit(text1,(0,0))
             screen.blit(text2,(0,WINDOW_HEIGHT-WINDOW_HEIGHT/8))
+            screen.blit(text3,(0,WINDOW_HEIGHT/6))
             py.display.flip()
             clock.tick(30)
+        if not done: print("entering game...")
         while not done:
             for event in py.event.get():
                 if event.type == py.QUIT:
@@ -224,4 +244,5 @@ def main():
 if __name__ == '__main__':
     main()
 
+print("exiting...")
 py.quit()
