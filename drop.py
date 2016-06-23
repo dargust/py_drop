@@ -52,21 +52,25 @@ class Game():
         def update(self):
             if 0 < self.rect.left+self.delta < _width-self.size: self.rect.left += self.delta
     class Block():
-        block_image = py.image.load("Block.png")
+        block_image_list = []
+        for i in xrange(4,10):
+            block_image_list.append(py.image.load("Block"+str(i)+".png"))
         block_image_special = py.image.load("Block_special.png")
         block_image_point = py.image.load("Block_point.png")
         def __init__(self,delta_delta,btype=0):
             size = random.randint(4,9)
             if btype == 0:
-                self.image = py.transform.scale(self.block_image,(size,size))
+                self.image = self.block_image_list[size-4]
             elif btype == 1:
-                self.image = py.transform.scale(self.block_image_special,(size+2,size+2))
+                self.image = self.block_image_special
             elif btype == 2:
                 size = 4
                 self.image = py.transform.scale(self.block_image_point,(size,size))
             self.type = btype
             self.delta = 0
             self.delta_delta = delta_delta
+            if delta_delta == 0:
+                self.delta = 1
             self.rect = py.Rect(random.randint(0,_width-size),-size,size,size)
         def update(self):
             self.rect.top += int(self.delta)
@@ -121,7 +125,7 @@ class Game():
             self.block_delta -= 0.0025
             self.level_timer = 0
             self.level_timer_max = int(self.level_timer_max * 1.1)
-            self.block_list.append(self.Block(0.01,1))
+            self.block_list.append(self.Block(0,1))
         self.block_point_counter += 1
         if self.block_point_counter >= self.block_point_counter_max:
             self.block_point_counter = 0
@@ -186,7 +190,9 @@ def main():
             clock.tick(30)
         while not done:
             for event in py.event.get():
-                if event.type == py.QUIT: done = True
+                if event.type == py.QUIT:
+                    done = True
+                    finished = True
                 elif event.type == py.VIDEORESIZE:
                     WINDOW_WIDTH,WINDOW_HEIGHT = event.dict['size']
                     screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
