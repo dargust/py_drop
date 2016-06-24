@@ -161,10 +161,10 @@ class Game():
                 self.surface.set_alpha(self.alpha)
                 if self.end_counter > 0: self.end_counter -= 1
                 else: return 1
-            text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT/4))
-            background = py.transform.scale(self.background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
-            screen.blit(background,(0,0))
-            screen.blit(text,(0,WINDOW_HEIGHT/6))
+            #text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT/4))
+            #background = py.transform.scale(self.background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
+            #screen.blit(background,(0,0))
+            #screen.blit(text,(0,WINDOW_HEIGHT/6))
         return 0
 
 def main():
