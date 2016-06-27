@@ -102,6 +102,7 @@ class Game():
         self.block_point_counter = 0
         self.block_point_counter_max = 150
         self.high_score = 0
+        self.game_over = None
         file_broken = False
         if os.path.isfile("gameinfo.dat"):
             print("checking highscores...")
@@ -156,6 +157,10 @@ class Game():
         self.surface.blit(self.player.image,self.player.rect)
         for block in self.block_list: self.surface.blit(block.image,block.rect)
         if self.done:
+            if not self.game_over:
+                self.background_image_2 = py.transform.scale(self.background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
+                self.text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT/4))
+                self.game_over = True
             if self.alpha > 0:
                 self.alpha -= 5
                 self.surface.set_alpha(self.alpha)
@@ -164,10 +169,8 @@ class Game():
                 self.surface.set_alpha(self.alpha)
                 if self.end_counter > 0: self.end_counter -= 1
                 else: return 1
-            #text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT/4))
-            #background = py.transform.scale(self.background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
-            #screen.blit(background,(0,0))
-            #screen.blit(text,(0,WINDOW_HEIGHT/6))
+            screen.blit(self.background_image_2,(0,0))
+            screen.blit(self.text,(0,WINDOW_HEIGHT/6))
         return 0
 
 def main():
