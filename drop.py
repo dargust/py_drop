@@ -5,7 +5,7 @@ import sys
 import os.path
 import hashlib,binascii
 py.init()
-####
+
 if len(sys.argv) > 1:
     try:
         a,b = sys.argv[1].split('x')
