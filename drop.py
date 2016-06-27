@@ -13,7 +13,7 @@ if len(sys.argv) > 1:
             a,b = 45,80
             print("window must be 45x80 or larger")
     except:
-        print("Incorrect syntax\nusage: python drop.py 180x320")
+        print("Incorrect syntax\nusage: python drop.py 360x640")
         a,b = 180,320
         py.quit()
         sys.exit()
@@ -102,6 +102,7 @@ class Game():
         self.block_point_counter = 0
         self.block_point_counter_max = 150
         self.high_score = 0
+        file_broken = False
         if os.path.isfile("gameinfo.dat"):
             print("checking highscores...")
             with open("gameinfo.dat","rb") as f:
@@ -114,8 +115,10 @@ class Game():
                 if not f.read(16) == binascii.unhexlify(md5(os.path.abspath(__file__),includeLine=str(self.high_score))):
                     print("highscores file corrupt...")
                     print("exiting...")
-                    py.quit()
-                    sys.exit()
+                    file_broken = True
+        if file_broken:
+            os.remove("gameinfo.dat")
+            self.high_score = 0
     
     def update(self):
         if self.holding_left: self.player.delta = -1
