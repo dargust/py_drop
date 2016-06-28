@@ -1,4 +1,4 @@
-from __future__ import print_function #
+from __future__ import print_function
 import pygame as py
 import random
 import sys
