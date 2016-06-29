@@ -150,8 +150,9 @@ class Game():
                 if not block.type == 2:
                     self.done = True
                 else:
-                    self.score += 10
-                    self.block_list.remove(block)
+                    if not self.game_over:
+                        self.score += 10
+                        self.block_list.remove(block)
             block.update()
         self.surface.blit(self.background_image,(0,0))
         self.surface.blit(self.player.image,self.player.rect)
