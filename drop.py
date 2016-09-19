@@ -51,12 +51,34 @@ class Game():
     class Player():
         def __init__(self):
             self.image = py.image.load("Player.png")
+            self.image_shield = py.image.load("Player_shield.png")
             self.size = 5
             self.rect = self.image.get_rect()
             self.rect.x,self.rect.y = _width/2-self.size/2,_height-self.size
             self.delta = 0
+            self.ability_1 = {"name":"Shield - active",
+                         "cooldown":30,
+                         "active":True,
+                         "invulnerable":2,
+                         "rem_block":True}
+            self.ability_timer = 0
+            self.active_ability_timer = 0
+            self.invulnerable = False
+            self.ability_active = False
+        def use_ability(self):
+            if not self.ability_timer:
+                self.ability_active = True
+                self.ability_timer = self.ability_1["cooldown"]*30
+                self.active_ability_timer = self.ability_1["invulnerable"]*30
         def update(self):
             if 0 < self.rect.left+self.delta < _width-self.size: self.rect.left += self.delta
+            if self.ability_timer > 0: self.ability_timer -= 1
+            if self.active_ability_timer > 0:
+                self.invulnerable = True
+                self.active_ability_timer -= 1
+            else:
+                self.ability_active = False
+                self.invulnerable = False
     class Block():
         block_image_list = []
         for i in xrange(4,10):
@@ -135,6 +157,7 @@ class Game():
         self.tick_counter += 1
         if self.level_timer >= self.level_timer_max and self.level < 30:
             self.level += 1
+            print("level: "+str(self.level))
             if self.block_delay > 3: self.block_delay -= 1
             self.block_delta -= 0.0025
             self.level_timer = 0
@@ -147,7 +170,7 @@ class Game():
         self.player.update()
         for block in self.block_list:
             if block.rect.colliderect(self.player.rect):
-                if not block.type == 2:
+                if not block.type == 2 and not self.player.invulnerable:
                     self.done = True
                 else:
                     self.score += 10
@@ -155,7 +178,13 @@ class Game():
             block.update()
         self.surface.blit(self.background_image,(0,0))
         self.surface.blit(self.player.image,self.player.rect)
+        if self.player.invulnerable:
+            self.surface.blit(self.player.image_shield,self.player.rect)
         for block in self.block_list: self.surface.blit(block.image,block.rect)
+        bar_colour = (0,0,255)
+        if not self.player.ability_timer:
+            bar_colour = (0,160,0)
+        py.draw.rect(self.surface,bar_colour,(12,2,24-self.player.ability_timer/float(42),2))
         if self.done:
             if not self.game_over:
                 self.background_image_2 = py.transform.scale(self.background_image,(WINDOW_WIDTH,WINDOW_HEIGHT))
@@ -224,11 +253,12 @@ def main():
                     screen = py.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT),py.HWSURFACE|py.DOUBLEBUF|py.RESIZABLE)
                 elif event.type == py.KEYDOWN:
                     if event.key == py.K_ESCAPE: done = True
-                    elif event.key == py.K_LEFT: game.holding_left = True
-                    elif event.key == py.K_RIGHT: game.holding_right = True
+                    elif event.key == py.K_LEFT or event.key == py.K_n: game.holding_left = True
+                    elif event.key == py.K_RIGHT or event.key == py.K_m: game.holding_right = True
+                    elif event.key == py.K_SPACE: game.player.use_ability()
                 elif event.type == py.KEYUP:
-                    if event.key == py.K_LEFT: game.holding_left = False
-                    elif event.key == py.K_RIGHT: game.holding_right = False
+                    if event.key == py.K_LEFT or event.key == py.K_n: game.holding_left = False
+                    elif event.key == py.K_RIGHT or event.key == py.K_m: game.holding_right = False
             screen.fill((255,255,255))
             if game.update():
                 print("Final score: "+str(game.score))

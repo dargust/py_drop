@@ -1,0 +1,16 @@
+abilities:
+ - shield (activated)
+ - shield (passive)
+ - blink/dash (left/right)
+ - phase
+ - shrink (player)
+ - shrink (blocks)
+ - gun (bullet)
+ - gun (laser - thin)
+ - screen wipe
+ - points
+ - statue (shield - can't move, usage depletes, very slow regen)
+
+shop:
+ - menu's
+ - money system
