@@ -174,8 +174,9 @@ class Game():
                     self.done = True
                 else:
                     if not self.game_over:
+                        if self.player.invulnerable:
+                            self.block_list.remove(block)
                         self.score += 10
-                        self.block_list.remove(block)
             block.update()
         self.surface.blit(self.background_image,(0,0))
         self.surface.blit(self.player.image,self.player.rect)
