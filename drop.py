@@ -192,8 +192,8 @@ class Game():
                 self.text = py.transform.scale(font.render(str(self.score),1,(1,1,1)),(WINDOW_WIDTH,WINDOW_HEIGHT/4))
                 self.game_over = True
             if self.alpha > 0:
-                self.alpha -= 5
-                self.surface.set_alpha(self.alpha)
+                self.alpha = 0
+                #self.surface.set_alpha(self.alpha)
             else:
                 self.alpha = 0
                 self.surface.set_alpha(self.alpha)
